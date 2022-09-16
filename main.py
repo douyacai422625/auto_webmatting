@@ -1,57 +1,31 @@
-import os.path
-from removebg import RemoveBg
-from PIL import Image
-import shutil
+import os
+import sys
+from functions import click_upload,uploadImage,changebackground,downloadImage,closepage,click_first_upload_btn,open_website
 
-init_folder = 'C://李小蓉//外观//222'
-cut_folder = init_folder + "//" + 'cut_img'
-save_img_folder = init_folder + "//" + "matting"
+folder = r'C:\matting\appearance\222\cut_img'
 
-# 抠图需要调用的库
-rmbg = RemoveBg('e5toRpfFsqdo2tzrSoFqpAWY','error.log')
+browser = open_website()
 
-files = os.listdir(cut_folder)
-for i,file in enumerate(files):
-    img_path = cut_folder + "//" + file
-    rmbg.remove_background_from_img_file(img_path)
+names = os.listdir(folder)  # 列举出该目录下所有的文件名
+for i,name in enumerate(names):
+    path = os.path.join(folder, name)  # 拼接出图片完整路径
+    print('对图像: ',path,' 进行处理')
+    if i == 0:
+        upload_label = click_first_upload_btn(browser,name)
+    else:
+        upload_label = click_upload(browser,name)
 
-    rmbg_save_name = file + "_no_bg.png"
-    init_file = cut_folder + "//" + rmbg_save_name
-    save_img_path = save_img_folder + "//" + file.split('.')[0] + '.png'
+    if upload_label == -1:
+        print('佐糖登录过程或者点击上传图片过程中出现问题')
+        sys.exit(0)  # 退出当前程序，但不重启shell
 
-    shutil.move(init_file,save_img_path)
-    print(i)
-
-
-
-
-
-
-
-
-# for i in range(60):
-#     save_img_path = 'C://李小蓉//外观//222//cut_img//' + str(i) + ".png"
-#
-#
-#     rmbg.remove_background_from_img_file(save_img_path)
-#
-#     rmbg_name = save_img_path.split('//')[-1]
-#     save_rmbg_name = 'C://李小蓉//外观//222//cut_img//' + rmbg_name + '_no_bg.png'
-#
-#
-#     img = Image.open(save_img_path)
-#
-#
-#
+    uploadImage(path)
+    # 更换背景
+    changebackground(browser,name)
+    # 下载按钮
+    downloadImage(browser,name)
+    #下载完毕后需要关闭弹出的对话框
+    closepage(browser,name)
 
 
-
-
-
-# color = (255,255,255)
-# no_bg_image = Image.open('C://李小蓉//外观//222//cut_img//aa.png_no_bg.png')
-# x, y = no_bg_image.size
-# new_image = Image.new('RGBA', no_bg_image.size, color=color)
-# new_image.paste(no_bg_image, (0, 0, x, y), no_bg_image)
-# new_image.save('C://李小蓉//外观//222//cut_img//aa_white.png')
-# a = 1
+print('恭喜！全部完成')
